@@ -58,13 +58,13 @@
     </div>
     <div class="welcome-text">
         <h1>Welcome to the Home of Trend!</h1>
-        <p>Find the most chic outfits in our collection.</p>
+        <p>Here are some similar outfit options to choose from.</p>
     </div>
     <div class="grid-container">
         {% for img in images %}
         <div class="grid-item">
             <a href="{{ url_for('recommend_page', img_path=img) }}">
-             <img src="static/{{img}}" alt="Image" style="width:100%;height:auto;">
+             <img src="static\{{img}}" alt="Image" style="width:100%;height:auto;">
             </a>
         </div>
         {% endfor %}
