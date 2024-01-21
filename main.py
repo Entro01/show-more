@@ -50,8 +50,8 @@ app = Flask(__name__)
 @app.route('/')
 def landing_page():
     random_images = get_random_images()
-    image_urls = [url_for('static', filename=img) for img in random_images]
-    return render_template('landing.html', images=image_urls)
+    print(random_images)
+    return render_template('landing.html', images=random_images)
 
 #@app.route('/recommend', methods=['POST'])
 #def recommend_page():
