@@ -1,4 +1,3 @@
-import streamlit as st
 import os
 from PIL import Image
 import numpy as np
@@ -21,16 +20,6 @@ model = tensorflow.keras.Sequential([
     GlobalMaxPooling2D()
 ])
 
-st.title('Fashion Recommender System')
-
-def save_uploaded_file(uploaded_file):
-    try:
-        with open(os.path.join('uploads',uploaded_file.name),'wb') as f:
-            f.write(uploaded_file.getbuffer())
-        return 1
-    except:
-        return 0
-
 def feature_extraction(img_path,model):
     img = image.load_img(img_path, target_size=(224, 224))
     img_array = image.img_to_array(img)
@@ -49,32 +38,29 @@ def recommend(features,feature_list):
 
     return indices
 
-# steps
-# file upload -> save
-uploaded_file = st.file_uploader("Choose an image")
-if uploaded_file is not None:
-    if save_uploaded_file(uploaded_file):
-        # display the file
-        display_image = Image.open(uploaded_file)
-        st.image(display_image)
-        # feature extract
-        features = feature_extraction(os.path.join("uploads",uploaded_file.name),model)
-        #st.text(features)
-        # recommendention
-        indices = recommend(features,feature_list)
-        # show
-        col1,col2,col3,col4,col5 = st.beta_columns(5)
+import random
 
-        with col1:
-            st.image(filenames[indices[0][0]])
-        with col2:
-            st.image(filenames[indices[0][1]])
-        with col3:
-            st.image(filenames[indices[0][2]])
-        with col4:
-            st.image(filenames[indices[0][3]])
-        with col5:
-            st.image(filenames[indices[0][4]])
-    else:
-        st.header("Some error occured in file upload")
+def get_random_images():
+    return random.choices(filenames, k=4)
 
+from flask import Flask, url_for, render_template, request
+
+app = Flask(__name__)
+
+@app.route('/')
+def landing_page():
+    random_images = get_random_images()
+    image_urls = [url_for('static', filename=img) for img in random_images]
+    return render_template('landing.html', images=image_urls)
+
+#@app.route('/recommend', methods=['POST'])
+#def recommend_page():
+#    user_image = request.files['image']
+#    user_image.save("temp.jpg")
+#    user_features = feature_extraction("temp.jpg", model)
+#    recommended_images = recommend(user_features, feature_list)
+#    image_urls = [url_for('static', filename=img) for img in recommended_images]
+#    return render_template('recommend.html', images=image_urls)
+
+if __name__ == "__main__":
+    app.run(debug=True)
