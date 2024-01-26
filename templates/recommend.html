@@ -64,10 +64,11 @@
         {% for img in images %}
         <div class="grid-item">
             <a href="{{ url_for('recommend_page', img_path=img) }}">
-             <img src="static\{{img}}" alt="Image" style="width:100%;height:auto;">
+                <img src="/static/{{img}}" alt="Image" style="width:100%;height:auto;">
             </a>
         </div>
         {% endfor %}
     </div>
 </body>
+
 </html>
