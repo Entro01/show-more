@@ -7,6 +7,7 @@ from numpy.linalg import norm
 import os
 from tqdm import tqdm
 import pickle
+from pathlib import Path
 
 model = ResNet50(weights='imagenet',include_top=False,input_shape=(224,224,3))
 model.trainable = False
@@ -28,10 +29,14 @@ def extract_features(img_path,model):
 
     return normalized_result
 
-filenames = []
+# Construct the path to the static images directory
+static_images_path = Path('static/images')
 
-for file in os.listdir('static/images'):
-    filenames.append(os.path.join('static/images',file))
+# Get the list of image files in the static images directory
+filenames = [str(static_images_path / file) for file in os.listdir(static_images_path)]
+
+# Replace backslashes with forward slashes
+filenames = [filename.replace('\\', '/').replace('static/', '',  1) for filename in filenames]
 
 feature_list = []
 
@@ -39,5 +44,7 @@ for file in tqdm(filenames):
     feature_list.append(extract_features(file,model))
 
 pickle.dump(feature_list,open('embeddings.pkl','wb'))
+
 pickle.dump(filenames,open('filenames.pkl','wb'))
 
+print(filenames)
