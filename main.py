@@ -8,9 +8,12 @@ from tensorflow.keras.layers import GlobalMaxPooling2D
 from tensorflow.keras.applications.resnet50 import ResNet50,preprocess_input
 from sklearn.neighbors import NearestNeighbors
 from numpy.linalg import norm
+from flask import session, redirect, url_for
+from flask import jsonify
 
 feature_list = np.array(pickle.load(open('embeddings.pkl','rb')))
 filenames = pickle.load(open('filenames.pkl','rb'))
+
 
 model = ResNet50(weights='imagenet',include_top=False,input_shape=(224,224,3))
 model.trainable = False
@@ -47,20 +50,31 @@ from flask import Flask, url_for, render_template, request
 
 app = Flask(__name__)
 #app._static_folder = os.path.join(os.getcwd(), 'show-more/static')
+app.secret_key = 'your_secret_key_here'
+
+@app.route('/store_image_path', methods=['POST'])
+def store_image_path():
+    img_path = request.form.get('img_path')
+    session['selected_image_path'] = img_path
+    return jsonify({'success': True})
 
 @app.route('/')
 def landing_page():
     random_images = get_random_images()
-    #image_urls = [url_for('static', filename=img) for img in random_images]
     return render_template('landing.html', images=random_images)
 
-@app.route('/recommend/<img_path>', methods=['GET'])
-def recommend_page(img_path):
-    img_path = 'static/'+img_path
+@app.route('/recommend', methods=['GET'])
+def recommend_page():
+    img_path = session.get('selected_image_path', default='static/images/33634.jpg')
+    print(f"Retrieved img_path: {img_path}") # Debugging line
+    if img_path is None or not os.path.exists(img_path):
+        print("Invalid img_path")
+    # Handle the error, e.g., by redirecting to an error page or setting a default image path
+    else:
+        user_features = feature_extraction(img_path, model)
     user_features = feature_extraction(img_path, model)
     recommended_indices = recommend(user_features, feature_list)
     recommended_paths = [filenames[i] for i in recommended_indices[0]]
-    #image_urls = [url_for('static', filename=img) for img in recommended_images]
     return render_template('recommend.html', images=recommended_paths)
 
 if __name__ == "__main__":
