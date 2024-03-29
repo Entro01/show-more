@@ -61,6 +61,22 @@
         .recommendation-item{
             flex: 1 1 100%;
         }
+        .buy-now-btn, .add-to-cart-btn {
+            padding: 10px 20px;
+            margin-top: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .buy-now-btn {
+            background-color: #008CBA; /* Blue */
+            color: white;
+        }
+
+        .add-to-cart-btn {
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+
     </style>
 </head>
 <body>
@@ -79,6 +95,8 @@
             <p>Year: {{ product['year'] }}</p>
             <p>Usage: {{ product['usage'] }}</p>
             <p>Price: $100 </p>
+            <button class="buy-now-btn">Buy Now</button>
+            <button class="add-to-cart-btn">Add to Cart</button>
         </div>
     </div>
     <div class="recommendations-container">
