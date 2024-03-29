@@ -75,12 +75,14 @@ def recommend_page():
     print(f"Retrieved img_path: {img_path}")
     if img_path is None or not os.path.exists(img_path):
         print("Invalid img_path")
+        return redirect(url_for('landing_page'))
     else:
+        product_id = os.path.splitext(os.path.basename(img_path))[0]
+        product_details = df[df['id'] == int(product_id)].to_dict('records')[0]
         user_features = feature_extraction(img_path, model)
-    user_features = feature_extraction(img_path, model)
-    recommended_indices = recommend(user_features, feature_list)
-    recommended_paths = [filenames[i] for i in recommended_indices[0]]
-    return render_template('recommend.html', images=recommended_paths)
+        recommended_indices = recommend(user_features, feature_list)
+        recommended_paths = [filenames[i] for i in recommended_indices[0]]
+        return render_template('recommend.html', product=product_details, images=recommended_paths)
 
 if __name__ == "__main__":
     app.run(debug=True)

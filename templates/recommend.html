@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Landing Page</title>
+    <title>Recommendations</title>
     <style>
         body {
             margin: 0;
@@ -10,84 +10,74 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
         }
-        .menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 50px;
-            background-color: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 0px;
-            color: whitesmoke;
-        }
-        .welcome-text {
-            text-align: center;
-            padding: 50px 0;
-            margin-bottom: 10px;
-        }
-        h1 {
-            font-size: 2em;
-            color: #333;
-        }
-        p {
-            font-size: 1.2em;
-            color: #666;
-        }
-        .grid-container {
+        .product-details {
             display: grid;
-            grid-template-columns: auto auto;
-            padding: 10px;
-            margin: 0 auto;
-            width: 80%;
-        }
-        .grid-item {
-            border: 1px solid rgba(0, 0, 0, 0.8);
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
             padding: 20px;
-            font-size: 30px;
-            text-align: center;
-            grid-row: span 2;
+            background-color: white;
+            margin-bottom: 20px;
+        }
+        .product-details img {
+            width: 100%;
+            height: auto;
+        }
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .recommendation-item img {
+            width: 100%;
+            height: auto;
         }
     </style>
 </head>
 <body>
-    <div class="menu">
-        <h1><a href="/" style="color: inherit; text-decoration: none;">Show More</a></h1>
-    </div>
-    <div class="welcome-text">
-        <h1>Welcome to the Home of Trend!</h1>
-        <p>Here are some similar outfit options to choose from.</p>
-    </div>
-    <div class="grid-container">
-        {% for img in images %}
-        <div class="grid-item" onclick="handleImageClick('{{ img }}')">
-            <img src="{{ url_for('static', filename=img) }}" alt="Image" style="width:100%;height:auto;">
+    <div class="product-details">
+        <img src="{{ url_for('static', filename=product['id'] ~ '.jpg') }}" alt="{{ product['productDisplayName'] }}">
+        <div class="product-info">
+            <h2>{{ product['productDisplayName'] }}</h2>
+            <p>Gender: {{ product['gender'] }}</p>
+            <p>Article Type: {{ product['articleType'] }}</p>
+            <p>Base Colour: {{ product['baseColour'] }}</p>
+            <p>Season: {{ product['season'] }}</p>
+            <p>Year: {{ product['year'] }}</p>
+            <p>Usage: {{ product['usage'] }}</p>
+            <p>Price: $100</p>
         </div>
+    </div>
+    <div class="recommendations">
+        <h2>Recommendations</h2>
+        {% for img_path in images %}
+            <div class="recommendation-item" onclick="handleImageClick('{{ img_path }}')">
+                <img src="{{ url_for('static', filename=img_path) }}" alt="Recommended Product">
+            </div>
         {% endfor %}
     </div>
 
     <script>
         function handleImageClick(imgPath) {
-            // Prevent the default action
             event.preventDefault();
-
-            // Prepend 'static/' to the image path
+    
             var fullImgPath = 'static/' + imgPath;
             
-            // Send the image path to the server using AJAX
             fetch('/store_image_path', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: new URLSearchParams({ img_path: fullImgPath }) // Use URLSearchParams to format as form data
+                body: new URLSearchParams({ img_path: fullImgPath }) 
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Redirect to the recommend page after storing the image path
                     window.location.href = '/recommend';
                 }
             })
@@ -96,5 +86,4 @@
     </script>
 
 </body>
-
 </html>
