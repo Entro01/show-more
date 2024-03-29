@@ -10,7 +10,21 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
         }
+        .menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0px;
+            color: whitesmoke;
+        }
         .product-details {
+            margin-top: 60px;
             display: grid;
             grid-template-columns: 1fr 2fr;
             gap: 20px;
@@ -28,20 +42,34 @@
             justify-content: space-between;
         }
         .recommendations {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            display: flex;
+            justify-content: space-around;
             gap: 20px;
             padding: 20px;
+            height: 500px;
+            width: 100%;
+        }
+        .recommendations-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .recommendation-item img {
+            height: 100%;
             width: 100%;
-            height: auto;
+        }
+        .recommendation-item{
+            flex: 1 1 100%;
         }
     </style>
 </head>
 <body>
+    <div class="menu">
+        <h1><a href="/" style="color: inherit; text-decoration: none;">Show More</a></h1>
+    </div>
+    
     <div class="product-details">
-        <img src="{{ url_for('static', filename=product['id'] ~ '.jpg') }}" alt="{{ product['productDisplayName'] }}">
+        <img src="{{ url_for('static', filename='images/' ~ product['id'] ~ '.jpg') }}" alt="{{ product['productDisplayName'] }}">
         <div class="product-info">
             <h2>{{ product['productDisplayName'] }}</h2>
             <p>Gender: {{ product['gender'] }}</p>
@@ -50,17 +78,20 @@
             <p>Season: {{ product['season'] }}</p>
             <p>Year: {{ product['year'] }}</p>
             <p>Usage: {{ product['usage'] }}</p>
-            <p>Price: $100</p>
+            <p>Price: $100 </p>
         </div>
     </div>
-    <div class="recommendations">
+    <div class="recommendations-container">
         <h2>Recommendations</h2>
-        {% for img_path in images %}
-            <div class="recommendation-item" onclick="handleImageClick('{{ img_path }}')">
-                <img src="{{ url_for('static', filename=img_path) }}" alt="Recommended Product">
-            </div>
-        {% endfor %}
+        <div class="recommendations">
+            {% for img_path in images %}
+                <div class="recommendation-item" onclick="handleImageClick('{{ img_path }}')">
+                    <img src="{{ url_for('static', filename=img_path) }}" alt="Recommended Product">
+                </div>
+            {% endfor %}
+        </div>
     </div>
+    
 
     <script>
         function handleImageClick(imgPath) {
