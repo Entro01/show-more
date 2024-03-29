@@ -68,9 +68,10 @@
     <h2 class="category-title">{{ category }}</h2>
     <div class="product-grid">
         {% for product in products %}
-        <div class="product-item">
-            <img src="{{ url_for('static', filename='images/' ~ product['id'] ~ '.jpg') }}" alt="{{ product['productDisplayName'] }}" style="width:100%;height:auto;">        
-        </div>
+            {% set imgPath = 'images/' ~ product['id'] ~ '.jpg' %}
+            <div class="product-item" onclick="handleImageClick('{{ imgPath }}')">
+                <img src="{{ url_for('static', filename=imgPath) }}" alt="{{ product['productDisplayName'] }}" style="width:100%;height:auto;">
+            </div>
         {% endfor %}
     </div>
 </div>
@@ -79,24 +80,20 @@
 
     <script>
         function handleImageClick(imgPath) {
-            // Prevent the default action
             event.preventDefault();
 
-            // Prepend 'static/' to the image path
             var fullImgPath = 'static/' + imgPath;
             
-            // Send the image path to the server using AJAX
             fetch('/store_image_path', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: new URLSearchParams({ img_path: fullImgPath }) // Use URLSearchParams to format as form data
+                body: new URLSearchParams({ img_path: fullImgPath }) 
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Redirect to the recommend page after storing the image path
                     window.location.href = '/recommend';
                 }
             })
