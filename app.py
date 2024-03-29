@@ -29,6 +29,9 @@ def extract_features(img_path,model):
 
     return normalized_result
 
+feature_list = np.array(pickle.load(open('embeddings.pkl','rb')))
+filenames = pickle.load(open('filenames.pkl','rb'))
+
 filenames = []
 for file in os.listdir('static/images'):
     filenames.append(os.path.join('static/images',file))
@@ -51,4 +54,4 @@ filenames = [filename.replace('\\', '/').replace('static/', '',  1) for filename
 
 pickle.dump(filenames,open('filenames.pkl','wb'))
 
-print(filenames)
+print(len(filenames))

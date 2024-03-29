@@ -10,10 +10,10 @@ from sklearn.neighbors import NearestNeighbors
 from numpy.linalg import norm
 from flask import session, redirect, url_for
 from flask import jsonify
+import pandas as pd
 
 feature_list = np.array(pickle.load(open('embeddings.pkl','rb')))
 filenames = pickle.load(open('filenames.pkl','rb'))
-
 
 model = ResNet50(weights='imagenet',include_top=False,input_shape=(224,224,3))
 model.trainable = False
@@ -33,6 +33,17 @@ def feature_extraction(img_path,model):
 
     return normalized_result
 
+df = pd.read_csv('styles.csv', engine='python', on_bad_lines='skip')
+
+grouped_products = df.groupby('masterCategory')
+
+def get_random_products_by_category(grouped_products):
+    random_products = {}
+    for category, products in grouped_products:
+        sample_size = min(4, len(products))
+        random_products[category] = products.sample(sample_size).to_dict('records')
+    return random_products
+
 def recommend(features,feature_list):
     neighbors = NearestNeighbors(n_neighbors=4, algorithm='brute', metric='euclidean')
     neighbors.fit(feature_list)
@@ -40,11 +51,6 @@ def recommend(features,feature_list):
     distances, indices = neighbors.kneighbors([features])
 
     return indices
-
-import random
-
-def get_random_images():
-    return random.choices(filenames, k=4)
 
 from flask import Flask, url_for, render_template, request
 
@@ -60,16 +66,15 @@ def store_image_path():
 
 @app.route('/')
 def landing_page():
-    random_images = get_random_images()
-    return render_template('landing.html', images=random_images)
+    random_products_by_category = get_random_products_by_category(grouped_products)
+    return render_template('landing.html', random_products_by_category=random_products_by_category)
 
 @app.route('/recommend', methods=['GET'])
 def recommend_page():
     img_path = session.get('selected_image_path', default='static/images/33634.jpg')
-    print(f"Retrieved img_path: {img_path}") # Debugging line
+    print(f"Retrieved img_path: {img_path}")
     if img_path is None or not os.path.exists(img_path):
         print("Invalid img_path")
-    # Handle the error, e.g., by redirecting to an error page or setting a default image path
     else:
         user_features = feature_extraction(img_path, model)
     user_features = feature_extraction(img_path, model)

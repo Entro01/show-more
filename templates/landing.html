@@ -36,19 +36,22 @@
             font-size: 1.2em;
             color: #666;
         }
-        .grid-container {
-            display: grid;
-            grid-template-columns: auto auto;
-            padding: 10px;
-            margin: 0 auto;
-            width: 80%;
+        .category-section {
+            margin-bottom: 50px;
         }
-        .grid-item {
-            border: 1px solid rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            font-size: 30px;
+        .category-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .product-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .product-item {
+            width: 20%;
             text-align: center;
-            grid-row: span 2;
         }
     </style>
 </head>
@@ -60,13 +63,19 @@
         <h1>Welcome to the Home of Trend!</h1>
         <p>Find the most chic outfits in our collection.</p>
     </div>
-    <div class="grid-container">
-        {% for img in images %}
-        <div class="grid-item" onclick="handleImageClick('{{ img }}')">
-            <img src="{{ url_for('static', filename=img) }}" alt="Image" style="width:100%;height:auto;">
+    {% for category, products in random_products_by_category.items() %}
+<div class="category-section">
+    <h2 class="category-title">{{ category }}</h2>
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-item">
+            <img src="{{ url_for('static', filename='images/' ~ product['id'] ~ '.jpg') }}" alt="{{ product['productDisplayName'] }}" style="width:100%;height:auto;">        
         </div>
         {% endfor %}
     </div>
+</div>
+{% endfor %}
+
 
     <script>
         function handleImageClick(imgPath) {
